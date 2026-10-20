@@ -410,9 +410,11 @@ function graficarEjecutores(base){
     base.forEach(x=>{
 
         const nombre =
-        x["EJECUTOR"] ||
-        "Sin asignar";
+(x["EJECUTOR"] || "").trim();
 
+if(!nombre){
+    return;
+}
         if(nombre==="Sin asignar")
         return;
 
