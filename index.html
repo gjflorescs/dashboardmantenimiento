@@ -343,7 +343,9 @@ function actualizarDashboard(){
     ? 0
     : ((cerradas/total)*100)
       .toFixed(1);
-
+	console.log("TOTAL:", total);
+	console.log("CERRADAS:", cerradas);
+	console.log("PORCENTAJE:", porcentajeCumplimiento);
     otTotal.innerText = total;
     otCerradas.innerText = cerradas;
     otAbiertas.innerText = abiertas;
