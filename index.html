@@ -431,22 +431,26 @@ if(!nombre){
     if(chartEjecutores)
     chartEjecutores.destroy();
 
-    chartEjecutores =
-    new Chart(
-        ejecutores,
-        {
-            type:"bar",
-            data:{
-                labels:
-                top.map(x=>x[0]),
-                datasets:[{
-                    data:
-                    top.map(x=>x[1]),
-                    backgroundColor:"#2F3136"
-                }]
+    chartEjecutores = new Chart(
+    ejecutores,
+    {
+        type:"bar",
+        data:{
+            labels: top.map(x=>x[0]),
+            datasets:[{
+                data: top.map(x=>x[1]),
+                backgroundColor:"#2F3136"
+            }]
+        },
+        options:{
+            plugins:{
+                legend:{
+                    display:false
+                }
             }
         }
-    );
+    }
+);
 }
 
 function graficarEstados(base){
