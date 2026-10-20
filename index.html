@@ -338,7 +338,7 @@ function actualizarDashboard(){
     const abiertas =
     total - cerradas;
 
-    const cumplimiento =
+    const porcentajeCumplimiento =
     total === 0
     ? 0
     : ((cerradas/total)*100)
@@ -347,9 +347,10 @@ function actualizarDashboard(){
     otTotal.innerText = total;
     otCerradas.innerText = cerradas;
     otAbiertas.innerText = abiertas;
-    cumplimiento.innerText =
-    cumplimiento + "%";
-
+    document.getElementById(
+    	"cumplimiento"
+	).innerText =
+	porcentajeCumplimiento + "%";
     graficarMaquinas(base);
     graficarEjecutores(base);
     graficarEstados(base);
