@@ -1,0 +1,34 @@
+name: Actualizar Dashboard
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+
+  workflow_dispatch:
+
+jobs:
+  actualizar-json:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Descargar JSON
+        run: |
+          curl -L \
+          "TU_URL_PUBLICA_JSON" \
+          -o datos.json
+
+      - name: Commit cambios
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+
+          git add datos.json
+
+          git diff --staged --quiet || git commit -m "Actualizar JSON"
+
+          git push
