@@ -212,147 +212,104 @@ Sin actualizar
 
 <script>
 
-let datos=[];
-let datosParos=[];
-let datosConfig=[];
+let datos = [];
+let datosParos = [];
+let indicadores = [];
 
-let chart1;
-let chart2;
-let chart3;
-let chart4;
+let chartMaquinas;
+let chartEspecialidades;
+let chartEstado;
 
 async function cargarExcel(){
 
-    const response =
-    await fetch(
-        "./Pizarra%20actividades.xlsx?v="
-        + Date.now()
-    );
+    try{
 
-    const data =
-    await response.arrayBuffer();
+        const response =
+        await fetch(
+            "./Pizarra%20actividades.xlsx?v="+
+            Date.now()
+        );
 
-    const wb =
-    XLSX.read(data,{type:"array"});
+        const data =
+        await response.arrayBuffer();
 
-    datos =
-    XLSX.utils.sheet_to_json(
-        wb.Sheets["Pizarra DB"]
-    );
+        const workbook =
+        XLSX.read(
+            data,
+            {type:"array"}
+        );
 
-    datosParos =
-    XLSX.utils.sheet_to_json(
-        wb.Sheets["Paros_MTTR_MTBF"]
-    );
+        datos =
+        XLSX.utils.sheet_to_json(
+            workbook.Sheets["Pizarra DB"]
+        );
 
-    datosConfig =
-    XLSX.utils.sheet_to_json(
-        wb.Sheets["Configuracion"]
-    );
-    console.log("Hojas:", wb.SheetNames);
+        datosParos =
+        XLSX.utils.sheet_to_json(
+            workbook.Sheets["Paros_MTTR_MTBF"]
+        );
 
-    console.log("Pizarra:", datos.length);
+        indicadores =
+        XLSX.utils.sheet_to_json(
+            workbook.Sheets["Indicadores"],
+            {
+                header:["Indicador","Valor"]
+            }
+        );
 
-    console.log("Paros:", datosParos.length);
+        actualizarDashboard();
 
-    console.log("Config:", datosConfig);
-    
-    actualizarDashboard();
+        document.getElementById(
+            "ultimaActualizacion"
+        ).innerHTML =
+        "Actualizado<br>" +
+        new Date().toLocaleString();
 
-    document.getElementById(
-        "ultimaActualizacion"
-    ).innerHTML =
-    "Actualizado<br>" +
-    new Date().toLocaleString();
+    }
+    catch(error){
+
+        console.error(error);
+
+    }
 
 }
 
-function obtenerConfig(nombre,defecto){
+function obtenerIndicador(nombre){
 
-    const fila=
-    datosConfig.find(x=>
+    const fila =
+    indicadores.find(x =>
+
         String(
-            x.Variable||""
+            x.Indicador || ""
         )
+        .trim()
         .toLowerCase()
-        .includes(
-            nombre.toLowerCase()
-        )
+        ===
+        nombre.toLowerCase()
+
     );
 
     return fila
-        ? parseFloat(fila.Valor)
-        : defecto;
+        ? parseFloat(
+            String(fila.Valor)
+            .replace(",",".")
+        )
+        : 0;
 
 }
 
-function calcularConfiabilidad(){
-
-    let horasParo = 0;
-    let ocurrencias = 0;
-    let horasOperacion = 0;
-
-    datosParos.forEach(r => {
-
-        horasOperacion +=
-            parseFloat(
-                r["Horas de operación"]
-            ) || 0;
-
-        horasParo +=
-            (parseFloat(r["Tiempo_Mec"]) || 0) +
-            (parseFloat(r["Tiempo_Ele"]) || 0) +
-            (parseFloat(r["Tiempo_Auto"]) || 0) +
-            (parseFloat(r["Tiempo_Ins"]) || 0);
-
-        ocurrencias +=
-            (parseFloat(r["Ocurr_Mec"]) || 0) +
-            (parseFloat(r["Ocurr_Ele"]) || 0) +
-            (parseFloat(r["Ocurr_Auto"]) || 0) +
-            (parseFloat(r["Ocurr_Ins"]) || 0);
-
-    });
-
-    const mttr =
-        ocurrencias === 0
-        ? 0
-        : horasParo / ocurrencias;
-
-    const mtbf =
-        ocurrencias === 0
-        ? 0
-        : horasOperacion / ocurrencias;
-
-    const disponibilidad =
-        (mtbf + mttr) === 0
-        ? 0
-        : (
-            mtbf /
-            (mtbf + mttr)
-        ) * 100;
-
-    console.log("Horas Operación:", horasOperacion);
-    console.log("Horas Paro:", horasParo);
-    console.log("Ocurrencias:", ocurrencias);
-    console.log("MTTR:", mttr);
-    console.log("MTBF:", mtbf);
-    console.log("Disponibilidad:", disponibilidad);
-
-    return {
-        mttr,
-        mtbf,
-        disponibilidad
-    };
-
-}
 function actualizarDashboard(){
 
     const base =
-    datos.filter(x=>
+    datos.filter(x =>
 
-        (x["Máquina"]||"").trim()!==""
+        (x["Máquina"]||"")
+        .trim() !== ""
+
         &&
-        (x["Actividad"]||"").trim()!==""
+
+        (x["Actividad"]||"")
+        .trim() !== ""
 
     );
 
@@ -360,90 +317,210 @@ function actualizarDashboard(){
     base.length;
 
     const cerradas =
-    base.filter(x=>
+    base.filter(x =>
+
         String(
-            x["Estatus"]||""
+            x["Estatus"] || ""
         )
         .toLowerCase()
         .includes("cerrado")
+
     ).length;
 
     const abiertas =
-    total-cerradas;
+    total - cerradas;
 
     const cumplimiento =
     total===0
     ?0
     :(
-        cerradas/total*100
-    ).toFixed(1);
+        cerradas /
+        total
+    )*100;
 
     const maquinas =
     new Set(
-        base.map(
-            x=>x["Máquina"]
-        )
+        base
+        .map(x => x["Máquina"])
+        .filter(Boolean)
     ).size;
 
     const especialidades =
     new Set(
-        base.map(
-            x=>x["Personal"]
-        )
+        base
+        .map(x => x["Personal"])
+        .filter(Boolean)
     ).size;
 
-    const conf =
-    calcularConfiabilidad();
+    document.getElementById(
+        "otTotal"
+    ).innerText =
+    total;
 
-    otTotal.innerText = total;
-    otCerradas.innerText = cerradas;
-    otAbiertas.innerText = abiertas;
-    document.getElementById("cumplimiento").innerText = cumplimiento+"%";
+    document.getElementById(
+        "otCerradas"
+    ).innerText =
+    cerradas;
 
-    maquinas &&
-    (document.getElementById("maquinas").innerText = maquinas);
+    document.getElementById(
+        "otAbiertas"
+    ).innerText =
+    abiertas;
 
-    especialidades &&
-    (document.getElementById("especialidades").innerText = especialidades);
+    document.getElementById(
+        "cumplimiento"
+    ).innerText =
+    cumplimiento.toFixed(1) + "%";
 
-    document.getElementById("mttr").innerText =
-    conf.mttr.toFixed(2);
+    document.getElementById(
+        "maquinas"
+    ).innerText =
+    maquinas;
 
-    document.getElementById("mtbf").innerText =
-    conf.mtbf.toFixed(2);
+    document.getElementById(
+        "especialidades"
+    ).innerText =
+    especialidades;
 
-    document.getElementById("disponibilidad").innerText =
-    conf.disponibilidad.toFixed(1)+"%";
+    document.getElementById(
+        "mttr"
+    ).innerText =
+    obtenerIndicador("MTTR")
+    .toFixed(2);
 
-    graficos(base);
+    document.getElementById(
+        "mtbf"
+    ).innerText =
+    obtenerIndicador("MTBF")
+    .toFixed(2);
+
+    document.getElementById(
+        "disponibilidad"
+    ).innerText =
+    obtenerIndicador(
+        "Disponibilidad"
+    ).toFixed(2) + "%";
+
+    graficarMaquinas(base);
+    graficarEspecialidades(base);
+    graficarEstados(base);
     construirRuta(base);
 
 }
 
-function graficos(base){
+function graficarMaquinas(base){
 
-    let maq={};
+    const conteo = {};
 
-    base.forEach(r=>{
-        maq[r["Máquina"]] =
-        (maq[r["Máquina"]]||0)+1;
+    base.forEach(x => {
+
+        const maquina =
+        x["Máquina"];
+
+        conteo[maquina] =
+        (conteo[maquina]||0)+1;
+
     });
 
-    const top=
-    Object.entries(maq)
+    const top =
+    Object.entries(conteo)
     .sort((a,b)=>b[1]-a[1])
     .slice(0,10);
 
-    if(chart1) chart1.destroy();
+    if(chartMaquinas)
+        chartMaquinas.destroy();
 
-    chart1=new Chart(
-        paretoMaquinas,
+    chartMaquinas =
+    new Chart(
+        document.getElementById(
+            "paretoMaquinas"
+        ),
         {
             type:"bar",
             data:{
-                labels:top.map(x=>x[0]),
+                labels:
+                top.map(x=>x[0]),
                 datasets:[{
-                    data:top.map(x=>x[1])
+                    label:"OT",
+                    data:
+                    top.map(x=>x[1]),
+                    backgroundColor:"#C9A86A"
+                }]
+            }
+        }
+    );
+
+}
+
+function graficarEspecialidades(base){
+
+    const conteo={};
+
+    base.forEach(x=>{
+
+        const especialidad =
+        x["Personal"] ||
+        "Sin dato";
+
+        conteo[especialidad] =
+        (conteo[especialidad]||0)+1;
+
+    });
+
+    if(chartEspecialidades)
+        chartEspecialidades.destroy();
+
+    chartEspecialidades =
+    new Chart(
+        document.getElementById(
+            "especialidadesChart"
+        ),
+        {
+            type:"pie",
+            data:{
+                labels:
+                Object.keys(conteo),
+                datasets:[{
+                    data:
+                    Object.values(conteo)
+                }]
+            }
+        }
+    );
+
+}
+
+function graficarEstados(base){
+
+    const conteo={};
+
+    base.forEach(x=>{
+
+        const estado =
+        x["Estatus"] ||
+        "Sin dato";
+
+        conteo[estado] =
+        (conteo[estado]||0)+1;
+
+    });
+
+    if(chartEstado)
+        chartEstado.destroy();
+
+    chartEstado =
+    new Chart(
+        document.getElementById(
+            "estadoChart"
+        ),
+        {
+            type:"doughnut",
+            data:{
+                labels:
+                Object.keys(conteo),
+                datasets:[{
+                    data:
+                    Object.values(conteo)
                 }]
             }
         }
@@ -453,20 +530,22 @@ function graficos(base){
 
 function construirRuta(base){
 
-    let html="";
+    let html = "";
 
     base
-    .filter(x=>
+    .filter(x =>
+
         !String(
-            x["Estatus"]||""
+            x["Estatus"] || ""
         )
         .toLowerCase()
         .includes("cerrado")
+
     )
     .slice(0,20)
-    .forEach(r=>{
+    .forEach(r => {
 
-        html+=`
+        html += `
         <tr>
             <td>${r["Máquina"]||""}</td>
             <td>${r["Actividad"]||""}</td>
@@ -477,12 +556,17 @@ function construirRuta(base){
 
     });
 
-    tablaRuta.innerHTML=html;
+    document.getElementById(
+        "tablaRuta"
+    ).innerHTML = html;
 
 }
 
-window.onload=()=>{
+window.onload =
+function(){
+
     cargarExcel();
+
 };
 
 setInterval(
@@ -491,6 +575,5 @@ setInterval(
 );
 
 </script>
-
 </body>
 </html>
