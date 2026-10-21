@@ -226,8 +226,8 @@ async function cargarExcel(){
 
         const response =
         await fetch(
-            "./Pizarra%20actividades.xlsx?v="+
-            Date.now()
+            "./Pizarra%20actividades.xlsx?v="
+            + Date.now()
         );
 
         const data =
@@ -251,10 +251,7 @@ async function cargarExcel(){
 
         indicadores =
         XLSX.utils.sheet_to_json(
-            workbook.Sheets["Indicadores"],
-            {
-                header:["Indicador","Valor"]
-            }
+            workbook.Sheets["Indicadores"]
         );
 
         actualizarDashboard();
@@ -273,7 +270,6 @@ async function cargarExcel(){
     }
 
 }
-
 function obtenerIndicador(nombre){
 
     const fila =
@@ -289,17 +285,26 @@ function obtenerIndicador(nombre){
 
     );
 
-    return fila
-        ? parseFloat(
-            String(fila.Valor)
-            .replace(",",".")
-        )
-        : 0;
+    if(!fila) return 0;
+
+    return parseFloat(
+        String(
+            fila.Valor
+        ).replace(",",".")
+    ) || 0;
 
 }
-
 function actualizarDashboard(){
 
+    const mttr =
+    obtenerIndicador("MTTR");
+
+    const mtbf =
+    obtenerIndicador("MTBF");
+
+    const disponibilidad =
+    obtenerIndicador("Disponibilidad");
+    
     const base =
     datos.filter(x =>
 
@@ -352,6 +357,21 @@ function actualizarDashboard(){
         .filter(Boolean)
     ).size;
 
+    document.getElementById(
+    "mttr"
+    ).innerText =
+    mttr.toFixed(2);
+
+    document.getElementById(
+    "mtbf"
+    ).innerText =
+    mtbf.toFixed(2);
+
+    document.getElementById(
+    "disponibilidad"
+    ).innerText =
+    disponibilidad.toFixed(2) + "%";
+    
     document.getElementById(
         "otTotal"
     ).innerText =
