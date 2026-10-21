@@ -111,6 +111,20 @@ Sin actualizar
 
 <h1>Dashboard Ejecutivo</h1>
 
+<input
+    type="file"
+    id="archivoExcel"
+    accept=".xlsx"
+    style="
+        margin-bottom:20px;
+        padding:10px;
+        background:white;
+        border-radius:8px;
+        border:1px solid #ccc;
+    "
+>
+
+
 <div class="kpis">
 
 <div class="card">
@@ -220,18 +234,12 @@ let chartMaquinas;
 let chartEspecialidades;
 let chartEstado;
 
-async function cargarExcel(){
+async function cargarExcel(archivo){
 
     try{
 
-        const response =
-        await fetch(
-            "./Pizarra%20actividades.xlsx?v="
-            + Date.now()
-        );
-
         const data =
-        await response.arrayBuffer();
+        await archivo.arrayBuffer();
 
         const workbook =
         XLSX.read(
@@ -270,6 +278,8 @@ async function cargarExcel(){
     }
 
 }
+
+
 function obtenerIndicador(nombre){
 
     const fila =
@@ -582,16 +592,23 @@ function construirRuta(base){
 
 }
 
-window.onload =
-function(){
+    document
+.getElementById("archivoExcel")
+.addEventListener(
+    "change",
+    async function(e){
 
-    cargarExcel();
+        const archivo =
+        e.target.files[0];
 
-};
+        if(!archivo)
+            return;
 
-setInterval(
-    cargarExcel,
-    60000
+        await cargarExcel(
+            archivo
+        );
+
+    }
 );
 
 </script>
