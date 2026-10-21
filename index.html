@@ -290,61 +290,54 @@ function calcularConfiabilidad(){
 
     let horasParo = 0;
     let ocurrencias = 0;
+    let horasOperacion = 0;
 
     datosParos.forEach(r => {
 
+        horasOperacion +=
+            parseFloat(
+                r["Horas de operación"]
+            ) || 0;
+
         horasParo +=
-            (parseFloat(r["Mecánica"]) || 0) +
-            (parseFloat(r["Eléctrica"]) || 0) +
-            (parseFloat(r["Automatización"]) || 0) +
-            (parseFloat(r["Instrumentación"]) || 0);
+            (parseFloat(r["Tiempo_Mec"]) || 0) +
+            (parseFloat(r["Tiempo_Ele"]) || 0) +
+            (parseFloat(r["Tiempo_Auto"]) || 0) +
+            (parseFloat(r["Tiempo_Ins"]) || 0);
 
         ocurrencias +=
-            (parseFloat(r["__EMPTY"]) || 0) +
-            (parseFloat(r["__EMPTY_2"]) || 0) +
-            (parseFloat(r["__EMPTY_3"]) || 0) +
-            (parseFloat(r["__EMPTY_4"]) || 0);
+            (parseFloat(r["Ocurr_Mec"]) || 0) +
+            (parseFloat(r["Ocurr_Ele"]) || 0) +
+            (parseFloat(r["Ocurr_Auto"]) || 0) +
+            (parseFloat(r["Ocurr_Ins"]) || 0);
 
     });
 
-    const filaOperacion =
-    datosConfig.find(r =>
-        String(
-            r.Variable || ""
-        )
-        .toLowerCase()
-        .includes("horas operación")
-    );
+    const mttr =
+        ocurrencias === 0
+        ? 0
+        : horasParo / ocurrencias;
 
-    let horasOperacion = 0;
+    const mtbf =
+        ocurrencias === 0
+        ? 0
+        : horasOperacion / ocurrencias;
 
-datosParos.forEach(r => {
+    const disponibilidad =
+        (mtbf + mttr) === 0
+        ? 0
+        : (
+            mtbf /
+            (mtbf + mttr)
+        ) * 100;
 
-    horasOperacion +=
-        parseFloat(
-            r["Horas de operación"]
-        ) || 0;
+    console.log("Horas Operación:", horasOperacion);
+    console.log("Horas Paro:", horasParo);
+    console.log("Ocurrencias:", ocurrencias);
+    console.log("MTTR:", mttr);
+    console.log("MTBF:", mtbf);
+    console.log("Disponibilidad:", disponibilidad);
 
-});
-
-const mttr =
-ocurrencias === 0
-? 0
-: horasParo / ocurrencias;
-
-const mtbf =
-ocurrencias === 0
-? 0
-: horasOperacion / ocurrencias;
-
-const disponibilidad =
-(mtbf + mttr) === 0
-? 0
-: (
-    mtbf /
-    (mtbf + mttr)
-) * 100;
-    
     return {
         mttr,
         mtbf,
