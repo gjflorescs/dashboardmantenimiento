@@ -281,58 +281,56 @@ function obtenerConfig(nombre,defecto){
 
 function calcularConfiabilidad(){
 
-    const columnasTiempo =
-    Object.keys(datosParos[0]||{})
-    .filter(c=>
-        c.toLowerCase()
-        .includes("tiempo")
-    );
+    let horasParo = 0;
+    let ocurrencias = 0;
 
-    const columnasOcurr =
-    Object.keys(datosParos[0]||{})
-    .filter(c=>
-        c.toLowerCase()
-        .includes("ocurr")
-    );
+    datosParos.forEach(r => {
 
-    let horas=0;
-    let ocurr=0;
+        horasParo +=
+            (parseFloat(r["Mecánica"]) || 0) +
+            (parseFloat(r["Eléctrica"]) || 0) +
+            (parseFloat(r["Automatización"]) || 0) +
+            (parseFloat(r["Instrumentación"]) || 0);
 
-    columnasTiempo.forEach(col=>{
-        datosParos.forEach(r=>{
-            horas +=
-            parseFloat(r[col])||0;
-        });
+        ocurrencias +=
+            (parseFloat(r["__EMPTY"]) || 0) +
+            (parseFloat(r["__EMPTY_2"]) || 0) +
+            (parseFloat(r["__EMPTY_3"]) || 0) +
+            (parseFloat(r["__EMPTY_4"]) || 0);
+
     });
 
-    columnasOcurr.forEach(col=>{
-        datosParos.forEach(r=>{
-            ocurr +=
-            parseFloat(r[col])||0;
-        });
-    });
+    const filaOperacion =
+    datosConfig.find(r =>
+        String(
+            r.Variable || ""
+        )
+        .toLowerCase()
+        .includes("horas operación")
+    );
 
     const horasOperacion =
-    obtenerConfig(
-        "Horas Operación",
-        720
-    );
+    parseFloat(
+        filaOperacion?.Valor
+    ) || 720;
 
     const mttr =
-    ocurr===0 ? 0 :
-    horas / ocurr;
+    ocurrencias === 0
+    ? 0
+    : horasParo / ocurrencias;
 
     const mtbf =
-    ocurr===0 ? 0 :
-    horasOperacion / ocurr;
+    ocurrencias === 0
+    ? 0
+    : horasOperacion / ocurrencias;
 
     const disponibilidad =
-    (mtbf+mttr)===0
-    ?0
-    :(
+    (mtbf + mttr) === 0
+    ? 0
+    : (
         mtbf /
-        (mtbf+mttr)
-    )*100;
+        (mtbf + mttr)
+    ) * 100;
 
     return {
         mttr,
@@ -341,7 +339,6 @@ function calcularConfiabilidad(){
     };
 
 }
-
 function actualizarDashboard(){
 
     const base =
