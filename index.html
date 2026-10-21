@@ -113,6 +113,30 @@ th,td{
 	<div id="cumplimiento" class="valor">0%</div>
 	<div>% Cumplimiento</div>
 	</div>
+	<div class="card">
+    <div id="mttr" class="valor">0</div>
+    <div>MTTR</div>
+</div>
+
+<div class="card">
+    <div id="mtbf" class="valor">0</div>
+    <div>MTBF</div>
+</div>
+
+<div class="card">
+    <div id="disponibilidad" class="valor">0%</div>
+    <div>Disponibilidad</div>
+</div>
+
+<div class="card">
+    <div id="maquinas" class="valor">0</div>
+    <div>Máquinas</div>
+</div>
+
+<div class="card">
+    <div id="especialidades" class="valor">0</div>
+    <div>Especialidades</div>
+</div>
 	</div>
 	<div class="grid">
 	<div class="chart-card">
@@ -150,17 +174,139 @@ th,td{
 	</div>
 	<script>
 	let datos=[];
+	let datosParos=[];
+	let datosConfig=[];
 	let chartMaquinas,chartEjecutores,chartEstados,chartTipos;
 	async function cargarExcel(){
 		try{
 			const response=await fetch('./Pizarra%20actividades.xlsx?v='+Date.now());
 			const data=await response.arrayBuffer();
 			const wb=XLSX.read(data,{type:'array'});
-			const ws=wb.Sheets['Pizarra DB'];
-			
-			datos=XLSX.utils.sheet_to_json(ws);
+			const wsPizarra =
+wb.Sheets['Pizarra DB'];
+
+const wsParos =
+wb.Sheets['Paros_MTTR_MTBF'];
+
+const wsConfig =
+wb.Sheets['Configuracion'];
+
+datos =
+XLSX.utils.sheet_to_json(wsPizarra);
+
+datosParos =
+XLSX.utils.sheet_to_json(wsParos);
+
+datosConfig =
+XLSX.utils.sheet_to_json(wsConfig);
 			llenarFiltros();
+function calcularConfiabilidad(){
+
+    const columnasTiempo =
+    Object.keys(datosParos[0] || {})
+    .filter(c =>
+        c.toLowerCase().includes("tiempo")
+    );
+
+    const columnasOcurr =
+    Object.keys(datosParos[0] || {})
+    .filter(c =>
+        c.toLowerCase().includes("ocurr")
+    );
+
+    let horasParo = 0;
+    let ocurrencias = 0;
+
+    columnasTiempo.forEach(col => {
+
+        datosParos.forEach(r => {
+
+            horasParo +=
+            parseFloat(r[col]) || 0;
+
+        });
+
+    });
+
+    columnasOcurr.forEach(col => {
+
+        datosParos.forEach(r => {
+
+            ocurrencias +=
+            parseFloat(r[col]) || 0;
+
+        });
+
+    });
+
+    const horasOperacionRow =
+    datosConfig.find(r =>
+        String(
+            r.Variable || ""
+        )
+        .toLowerCase()
+        .includes("horas operación")
+    );
+
+    const horasOperacion =
+    parseFloat(
+        horasOperacionRow?.Valor
+    ) || 720;
+
+    const mttr =
+    ocurrencias === 0
+    ? 0
+    : horasParo / ocurrencias;
+
+    const mtbf =
+    ocurrencias === 0
+    ? 0
+    : horasOperacion / ocurrencias;
+
+    const disponibilidad =
+    (mtbf + mttr) === 0
+    ? 0
+    : (
+        mtbf /
+        (mtbf + mttr)
+      ) * 100;
+
+    return {
+
+        mttr,
+        mtbf,
+        disponibilidad
+
+    };
+}
+			
 			actualizarDashboard();
+			const maquinas =
+new Set(
+    base
+    .map(x=>x["Máquina"])
+    .filter(Boolean)
+).size;
+
+const especialidades =
+new Set(
+    base
+    .map(x=>x["Personal"])
+    .filter(Boolean)
+).size;
+
+document
+.getElementById("maquinas")
+.innerText =
+maquinas;
+
+document
+.getElementById("especialidades")
+.innerText =
+especialidades;
+
+			const confiabilidad =
+calcularConfiabilidad();
 			document.getElementById('ultimaActualizacion').innerHTML='Actualizado:<br>'+new Date().toLocaleString();
 			}
 			catch(e){
@@ -194,6 +340,29 @@ th,td{
 				otCerradas.innerText=cerradas;
 				otAbiertas.innerText=abiertas;
 				document.getElementById('cumplimiento').innerText=porcentaje+'%';
+				const maquinas =
+new Set(
+    base
+    .map(x=>x["Máquina"])
+    .filter(Boolean)
+).size;
+
+const especialidades =
+new Set(
+    base
+    .map(x=>x["Personal"])
+    .filter(Boolean)
+).size;
+
+document.getElementById(
+    "maquinas"
+).innerText =
+maquinas;
+
+document.getElementById(
+    "especialidades"
+).innerText =
+especialidades;
 				graficarMaquinas(base);
 				graficarEjecutores(base);
 				graficarEstados(base);
