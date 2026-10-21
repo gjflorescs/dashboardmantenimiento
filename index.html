@@ -309,21 +309,34 @@ function calcularConfiabilidad(){
         .includes("horas operación")
     );
 
-    const horasOperacion =
-    parseFloat(
-        filaOperacion?.Valor
-    ) || 720;
+    let horasOperacion = 0;
 
-    const mttr =
-    ocurrencias === 0
-    ? 0
-    : horasParo / ocurrencias;
+datosParos.forEach(r => {
 
-    const mtbf =
-    ocurrencias === 0
-    ? 0
-    : horasOperacion / ocurrencias;
+    horasOperacion +=
+        parseFloat(
+            r["Horas de operación"]
+        ) || 0;
 
+});
+
+const mttr =
+ocurrencias === 0
+? 0
+: horasParo / ocurrencias;
+
+const mtbf =
+ocurrencias === 0
+? 0
+: horasOperacion / ocurrencias;
+
+const disponibilidad =
+(mtbf + mttr) === 0
+? 0
+: (
+    mtbf /
+    (mtbf + mttr)
+) * 100;
     const disponibilidad =
     (mtbf + mttr) === 0
     ? 0
