@@ -241,7 +241,7 @@ Sin actualizar
 let datos = [];
 let datosParos = [];
 let indicadores = [];
-let chartHoras;
+
 let chartMaquinas;
 let chartEspecialidades;
 let chartEstado;
@@ -291,6 +291,8 @@ async function cargarExcel(archivo){
 
 }
 
+let chartHoras;
+
 function graficarHorasPerdidas(){
 
     const conteo = {};
@@ -298,24 +300,24 @@ function graficarHorasPerdidas(){
     datosParos.forEach(r => {
 
         const equipo =
-            r["Descripción"] ||
-            r["Equipo"] ||
-            r["Equipos"] ||
-            "Sin dato";
+            r["Descripción"] || "Sin dato";
 
         const tiempoTotal =
-
             (parseFloat(r["Tiempo_Mec"]) || 0) +
             (parseFloat(r["Tiempo_Ele"]) || 0) +
             (parseFloat(r["Tiempo_Auto"]) || 0) +
             (parseFloat(r["Tiempo_Ins"]) || 0);
 
-        conteo[equipo] = tiempoTotal;
+        conteo[equipo] =
+            (conteo[equipo] || 0) +
+            tiempoTotal;
 
     });
 
-    const top = Object.entries(conteo)
-        .sort((a,b) => b[1]-a[1])
+    const top =
+        Object.entries(conteo)
+        .filter(x => x[1] > 0)
+        .sort((a,b) => b[1] - a[1])
         .slice(0,10);
 
     if(chartHoras)
@@ -323,18 +325,16 @@ function graficarHorasPerdidas(){
 
     chartHoras =
         new Chart(
-            document.getElementById(
-                "horasChart"
-            ),
+            document.getElementById("horasChart"),
             {
                 type:"bar",
                 data:{
                     labels:
-                        top.map(x=>x[0]),
+                        top.map(x => x[0]),
                     datasets:[{
                         label:"Horas Perdidas",
                         data:
-                            top.map(x=>x[1]),
+                            top.map(x => x[1]),
                         backgroundColor:"#C9A86A"
                     }]
                 },
@@ -348,6 +348,7 @@ function graficarHorasPerdidas(){
                     },
                     scales:{
                         x:{
+                            beginAtZero:true,
                             title:{
                                 display:true,
                                 text:"Horas"
