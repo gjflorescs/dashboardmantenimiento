@@ -302,23 +302,32 @@ function graficarHorasPerdidas(){
         const equipo =
             r["Descripción"] || "Sin dato";
 
-        const tiempoTotal =
-            (parseFloat(r["Tiempo_Mec"]) || 0) +
-            (parseFloat(r["Tiempo_Ele"]) || 0) +
-            (parseFloat(r["Tiempo_Auto"]) || 0) +
-            (parseFloat(r["Tiempo_Ins"]) || 0);
+        let tiempoTotal = 0;
 
-        conteo[equipo] =
-            (conteo[equipo] || 0) +
-            tiempoTotal;
+        Object.keys(r).forEach(col => {
+
+            if(col.startsWith("Tiempo_")){
+
+                tiempoTotal +=
+                    parseFloat(
+                        String(r[col]).replace(",",".")
+                    ) || 0;
+
+            }
+
+        });
+
+        conteo[equipo] = tiempoTotal;
 
     });
 
     const top =
         Object.entries(conteo)
         .filter(x => x[1] > 0)
-        .sort((a,b) => b[1] - a[1])
+        .sort((a,b)=>b[1]-a[1])
         .slice(0,10);
+
+    console.log(top);
 
     if(chartHoras)
         chartHoras.destroy();
@@ -329,12 +338,10 @@ function graficarHorasPerdidas(){
             {
                 type:"bar",
                 data:{
-                    labels:
-                        top.map(x => x[0]),
+                    labels:top.map(x=>x[0]),
                     datasets:[{
                         label:"Horas Perdidas",
-                        data:
-                            top.map(x => x[1]),
+                        data:top.map(x=>x[1]),
                         backgroundColor:"#C9A86A"
                     }]
                 },
@@ -345,20 +352,10 @@ function graficarHorasPerdidas(){
                         legend:{
                             display:false
                         }
-                    },
-                    scales:{
-                        x:{
-                            beginAtZero:true,
-                            title:{
-                                display:true,
-                                text:"Horas"
-                            }
-                        }
                     }
                 }
             }
         );
-
 }
 
 function obtenerIndicador(nombre){
