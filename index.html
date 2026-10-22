@@ -101,6 +101,33 @@ th,td{
 
 <p>📊 Mantenimiento</p>
 
+<div style="margin:15px 0;">
+
+    <label
+        for="archivoExcel"
+        style="
+            display:block;
+            background:#C9A86A;
+            color:#2F3136;
+            text-align:center;
+            padding:10px;
+            border-radius:8px;
+            font-weight:bold;
+            cursor:pointer;
+        "
+    >
+        📁 Cargar Excel
+    </label>
+
+    <input
+        type="file"
+        id="archivoExcel"
+        accept=".xlsx"
+        style="display:none;"
+    >
+
+</div>    
+
 <p id="ultimaActualizacion">
 Sin actualizar
 </p>
@@ -110,19 +137,6 @@ Sin actualizar
 <div class="main">
 
 <h1>Indicadores</h1>
-
-<input
-    type="file"
-    id="archivoExcel"
-    accept=".xlsx"
-    style="
-        margin-bottom:20px;
-        padding:10px;
-        background:white;
-        border-radius:8px;
-        border:1px solid #ccc;
-    "
->
 
 
 <div class="kpis">
