@@ -204,7 +204,7 @@ Sin actualizar
 </div>
 
 <div class="chart-card">
-<h3>Horas Perdidas</h3>
+<h3>Top 10 Equipos con Mayor Tiempo Perdido</h3>
 <canvas id="horasChart"></canvas>
 </div>
 
@@ -241,7 +241,7 @@ Sin actualizar
 let datos = [];
 let datosParos = [];
 let indicadores = [];
-
+let chartHoras;
 let chartMaquinas;
 let chartEspecialidades;
 let chartEstado;
@@ -291,6 +291,74 @@ async function cargarExcel(archivo){
 
 }
 
+function graficarHorasPerdidas(){
+
+    const conteo = {};
+
+    datosParos.forEach(r => {
+
+        const equipo =
+            r["Descripción"] ||
+            r["Equipo"] ||
+            r["Equipos"] ||
+            "Sin dato";
+
+        const tiempoTotal =
+
+            (parseFloat(r["Tiempo_Mec"]) || 0) +
+            (parseFloat(r["Tiempo_Ele"]) || 0) +
+            (parseFloat(r["Tiempo_Auto"]) || 0) +
+            (parseFloat(r["Tiempo_Ins"]) || 0);
+
+        conteo[equipo] = tiempoTotal;
+
+    });
+
+    const top = Object.entries(conteo)
+        .sort((a,b) => b[1]-a[1])
+        .slice(0,10);
+
+    if(chartHoras)
+        chartHoras.destroy();
+
+    chartHoras =
+        new Chart(
+            document.getElementById(
+                "horasChart"
+            ),
+            {
+                type:"bar",
+                data:{
+                    labels:
+                        top.map(x=>x[0]),
+                    datasets:[{
+                        label:"Horas Perdidas",
+                        data:
+                            top.map(x=>x[1]),
+                        backgroundColor:"#C9A86A"
+                    }]
+                },
+                options:{
+                    responsive:true,
+                    indexAxis:"y",
+                    plugins:{
+                        legend:{
+                            display:false
+                        }
+                    },
+                    scales:{
+                        x:{
+                            title:{
+                                display:true,
+                                text:"Horas"
+                            }
+                        }
+                    }
+                }
+            }
+        );
+
+}
 
 function obtenerIndicador(nombre){
 
@@ -446,6 +514,7 @@ function actualizarDashboard(){
     graficarMaquinas(base);
     graficarEspecialidades(base);
     graficarEstados(base);
+    graficarHorasPerdidas();
     construirRuta(base);
 
 }
