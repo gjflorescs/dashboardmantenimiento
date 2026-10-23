@@ -582,25 +582,31 @@ function graficarMaquinas(base){
     if(chartMaquinas)
         chartMaquinas.destroy();
 
-    chartMaquinas =
-    new Chart(
-        document.getElementById(
-            "paretoMaquinas"
-        ),
-        {
-            type:"bar",
-            data:{
-                labels:
-                top.map(x=>x[0]),
-                datasets:[{
-                    label:"OT",
-                    data:
-                    top.map(x=>x[1]),
-                    backgroundColor:"#C9A86A"
-                }]
+chartMaquinas =
+new Chart(
+    document.getElementById(
+        "paretoMaquinas"
+    ),
+    {
+        type:"bar",
+        data:{
+            labels:
+            top.map(x=>x[0]),
+            datasets:[{
+                data:
+                top.map(x=>x[1]),
+                backgroundColor:"#C9A86A"
+            }]
+        },
+        options:{
+            plugins:{
+                legend:{
+                    display:false
+                }
             }
         }
-    );
+    }
+);
 
 }
 
