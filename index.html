@@ -428,7 +428,7 @@ function actualizarDashboard(){
     const total =
     base.length;
 
-    const rutaCritica =
+const rutaCritica =
 base.filter(r =>
 
     String(
@@ -437,7 +437,16 @@ base.filter(r =>
     .trim()
     .toUpperCase() === "X"
 
-).length;
+    &&
+
+    String(
+        r["Estatus"] || ""
+    )
+    .trim()
+    .toLowerCase()
+    .includes("abierto")
+
+);
 
 document.getElementById(
     "rutaCriticaKpi"
@@ -684,6 +693,15 @@ function construirRuta(base){
         )
         .trim()
         .toUpperCase() === "X"
+
+        &&
+
+        String(
+            r["Estatus"] || ""
+        )
+        .trim()
+        .toLowerCase()
+        .includes("abierto")
 
     );
 
