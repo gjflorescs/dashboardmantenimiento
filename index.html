@@ -731,6 +731,108 @@ function graficarEstados(base){
 
 }
 
+function graficarReportantes(){
+
+    const conteo = {};
+
+    datosAvisos.forEach(r => {
+
+        const reporta =
+            r["Reporta"] || "Sin dato";
+
+        conteo[reporta] =
+            (conteo[reporta] || 0) + 1;
+
+    });
+
+    const top =
+        Object.entries(conteo)
+        .sort((a,b)=>b[1]-a[1])
+        .slice(0,10);
+
+    if(chartReportantes)
+        chartReportantes.destroy();
+
+    chartReportantes =
+        new Chart(
+            document.getElementById(
+                "reportantesChart"
+            ),
+            {
+                type:"bar",
+                data:{
+                    labels:
+                        top.map(x=>x[0]),
+                    datasets:[{
+                        data:
+                            top.map(x=>x[1]),
+                        backgroundColor:"#C9A86A"
+                    }]
+                },
+                options:{
+                    indexAxis:"y",
+                    plugins:{
+                        legend:{
+                            display:false
+                        }
+                    }
+                }
+            }
+        );
+
+}
+
+function graficarTecnicos(){
+
+    const conteo = {};
+
+    datosAvisos.forEach(r => {
+
+        const tecnico =
+            r["Tecnico"] || "Sin asignar";
+
+        conteo[tecnico] =
+            (conteo[tecnico] || 0) + 1;
+
+    });
+
+    const top =
+        Object.entries(conteo)
+        .sort((a,b)=>b[1]-a[1])
+        .slice(0,10);
+
+    if(chartTecnicos)
+        chartTecnicos.destroy();
+
+    chartTecnicos =
+        new Chart(
+            document.getElementById(
+                "tecnicosChart"
+            ),
+            {
+                type:"bar",
+                data:{
+                    labels:
+                        top.map(x=>x[0]),
+                    datasets:[{
+                        data:
+                            top.map(x=>x[1]),
+                        backgroundColor:"#2F3136"
+                    }]
+                },
+                options:{
+                    indexAxis:"y",
+                    plugins:{
+                        legend:{
+                            display:false
+                        }
+                    }
+                }
+            }
+        );
+
+}
+
 function construirRuta(base){
 
     let html = "";
