@@ -428,7 +428,7 @@ function actualizarDashboard(){
     const total =
     base.length;
 
-const rutaCritica =
+const rutaCriticaAbierta =
 base.filter(r =>
 
     String(
@@ -447,11 +447,10 @@ base.filter(r =>
     .includes("abierto")
 
 );
-
 document.getElementById(
     "rutaCriticaKpi"
 ).innerText =
-rutaCritica;
+rutaCriticaAbierta.length;
     
     const cerradas =
     base.filter(x =>
