@@ -203,6 +203,16 @@ Sin actualizar
 <div>Ruta Crítica</div>
 </div>
 
+<div class="card">
+<div id="avisosTotal" class="valor">0</div>
+<div>Total Avisos</div>
+</div>
+
+<div class="card">
+<div id="avisosCerrados" class="valor">0</div>
+<div>Avisos Cerrados</div>
+</div>
+
 </div>
 
 <div class="grid">
@@ -264,6 +274,7 @@ let indicadores = [];
 let chartMaquinas;
 let chartEspecialidades;
 let chartEstado;
+let datosAvisos = [];
 
 async function cargarExcel(archivo){
 
@@ -291,6 +302,11 @@ async function cargarExcel(archivo){
         indicadores =
         XLSX.utils.sheet_to_json(
             workbook.Sheets["Indicadores"]
+        );
+
+        datosAvisos =
+        XLSX.utils.sheet_to_json(
+        workbook.Sheets["Pizarra Avisos"]
         );
 
         actualizarDashboard();
@@ -411,6 +427,20 @@ function actualizarDashboard(){
 
     const disponibilidad =
     obtenerIndicador("Disponibilidad");
+
+    const totalAvisos =
+    datosAvisos.length;
+
+    const avisosCerrados =
+    datosAvisos.filter(x =>
+
+    String(
+        x["Estado"] || ""
+    )
+    .toLowerCase()
+    .includes("cerrado")
+
+    ).length;
     
     const base =
     datos.filter(x =>
@@ -492,6 +522,21 @@ rutaCriticaAbierta.length;
     "mttr"
     ).innerText =
     mttr.toFixed(2);
+
+    document.getElementById(
+    "avisosTotal"
+    ).innerText =
+    totalAvisos;
+
+    document.getElementById(
+    "avisosCerrados"
+    ).innerText =
+    avisosCerrados;
+
+    document.getElementById(
+    "avisosAbiertos"
+    ).innerText =
+    avisosAbiertos;
 
     document.getElementById(
     "mtbf"
