@@ -71,7 +71,7 @@ body{
 
 .grid{
     display:grid;
-    grid-template-columns:1fr 1fr;
+    grid-template-columns:repeat(auto-fit,minmax(500px,1fr))
     gap:20px;
     margin-top:20px;
 }
@@ -217,35 +217,35 @@ Sin actualizar
 
 <div class="grid">
 
-<div class="chart-card">
-<h3>OT por Máquinas</h3>
-<canvas id="paretoMaquinas"></canvas>
-</div>
+    <div class="chart-card">
+        <h3>OT por Máquinas</h3>
+        <canvas id="paretoMaquinas"></canvas>
+    </div>
 
-<div class="chart-card">
-<h3>OT por Especialidad</h3>
-<canvas id="especialidadesChart"></canvas>
-</div>
+    <div class="chart-card">
+        <h3>OT por Especialidad</h3>
+        <canvas id="especialidadesChart"></canvas>
+    </div>
 
-<div class="chart-card">
-<h3>Estado OT</h3>
-<canvas id="estadoChart"></canvas>
-</div>
+    <div class="chart-card">
+        <h3>Estado OT</h3>
+        <canvas id="estadoChart"></canvas>
+    </div>
 
-<div class="chart-card">
-<h3>Top 10 Equipos con Mayor Tiempo Perdido</h3>
+    <div class="chart-card">
+        <h3>Top 10 Equipos con Mayor Tiempo Perdido</h3>
+        <canvas id="horasChart"></canvas>
+    </div>
 
-<div class="chart-card">
-    <h3>Top Reportantes</h3>
-    <canvas id="reportantesChart"></canvas>
-</div>
+    <div class="chart-card">
+        <h3>Top Reportantes</h3>
+        <canvas id="reportantesChart"></canvas>
+    </div>
 
-<div class="chart-card">
-    <h3>Top Técnicos</h3>
-    <canvas id="tecnicosChart"></canvas>
-</div>
-<canvas id="horasChart"></canvas>
-</div>
+    <div class="chart-card">
+        <h3>Top Técnicos</h3>
+        <canvas id="tecnicosChart"></canvas>
+    </div>
 
 </div>
 
