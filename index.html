@@ -46,6 +46,11 @@ body{
     font-weight:700;
 }
 
+.rutaCritica{
+    background:#FFE9A8;
+    font-weight:bold;
+}
+
 .kpis{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
@@ -193,6 +198,11 @@ Sin actualizar
 <div>Especialidades</div>
 </div>
 
+<div class="card">
+<div id="rutaCriticaKpi" class="valor">0</div>
+<div>Ruta Crítica</div>
+</div>
+
 </div>
 
 <div class="grid">
@@ -231,7 +241,7 @@ Sin actualizar
 <tr>
 <th>Máquina</th>
 <th>Actividad</th>
-<th>Especialidad</th>
+<th>Tipo</th>
 <th>Estatus</th>
 </tr>
 </thead>
@@ -418,6 +428,22 @@ function actualizarDashboard(){
     const total =
     base.length;
 
+    const rutaCritica =
+base.filter(r =>
+
+    String(
+        r["Ruta Critica"] || ""
+    )
+    .trim()
+    .toUpperCase() === "X"
+
+).length;
+
+document.getElementById(
+    "rutaCriticaKpi"
+).innerText =
+rutaCritica;
+    
     const cerradas =
     base.filter(x =>
 
@@ -650,25 +676,25 @@ function construirRuta(base){
 
     let html = "";
 
-    base
-    .filter(x =>
+    const rutaCritica =
+    base.filter(r =>
 
-        !String(
-            x["Estatus"] || ""
+        String(
+            r["Ruta Critica"] || ""
         )
-        .toLowerCase()
-        .includes("cerrado")
+        .trim()
+        .toUpperCase() === "X"
 
-    )
-    .slice(0,20)
-    .forEach(r => {
+    );
+
+    rutaCritica.forEach(r => {
 
         html += `
-        <tr>
-            <td>${r["Máquina"]||""}</td>
-            <td>${r["Actividad"]||""}</td>
-            <td>${r["Personal"]||""}</td>
-            <td>${r["Estatus"]||""}</td>
+        <tr class="rutaCritica">
+            <td>${r["Máquina"] || ""}</td>
+            <td>${r["Actividad"] || ""}</td>
+            <td>${r["Tipo"] || ""}</td>
+            <td>${r["Estatus"] || ""}</td>
         </tr>
         `;
 
@@ -679,6 +705,7 @@ function construirRuta(base){
     ).innerHTML = html;
 
 }
+
 
     document
 .getElementById("archivoExcel")
