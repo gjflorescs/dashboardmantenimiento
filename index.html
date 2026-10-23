@@ -234,6 +234,16 @@ Sin actualizar
 
 <div class="chart-card">
 <h3>Top 10 Equipos con Mayor Tiempo Perdido</h3>
+
+<div class="chart-card">
+    <h3>Top Reportantes</h3>
+    <canvas id="reportantesChart"></canvas>
+</div>
+
+<div class="chart-card">
+    <h3>Top Técnicos</h3>
+    <canvas id="tecnicosChart"></canvas>
+</div>
 <canvas id="horasChart"></canvas>
 </div>
 
@@ -275,6 +285,8 @@ let chartMaquinas;
 let chartEspecialidades;
 let chartEstado;
 let datosAvisos = [];
+let chartReportantes;
+let chartTecnicos;
 
 async function cargarExcel(archivo){
 
@@ -601,6 +613,8 @@ rutaCriticaAbierta.length;
     graficarEspecialidades(base);
     graficarEstados(base);
     graficarHorasPerdidas();
+    graficarReportantes();
+    graficarTecnicos();
     construirRuta(base);
 
 }
