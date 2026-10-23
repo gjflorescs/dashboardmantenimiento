@@ -431,16 +431,21 @@ function actualizarDashboard(){
     const totalAvisos =
     datosAvisos.length;
 
-    const avisosCerrados =
-    datosAvisos.filter(x =>
+const avisosCerrados =
+datosAvisos.filter(x => {
 
+    const estado =
     String(
         x["Estado"] || ""
-    )
-    .toLowerCase()
-    .includes("cerrado")
+    ).toLowerCase();
 
-    ).length;
+    return (
+        estado.includes("cerrado")
+        ||
+        estado.includes("resuelto")
+    );
+
+}).length;
     
     const base =
     datos.filter(x =>
