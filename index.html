@@ -210,7 +210,7 @@ Sin actualizar
 
 <div class="card">
 <div id="avisosCerrados" class="valor">0</div>
-<div>Avisos Cerrados</div>
+<div>Cierre de Avisos</div>
 </div>
 
 </div>
@@ -545,10 +545,18 @@ rutaCriticaAbierta.length;
     ).innerText =
     totalAvisos;
 
-    document.getElementById(
+   const porcentajeAvisosCerrados =
+totalAvisos === 0
+? 0
+: (
+    avisosCerrados /
+    totalAvisos
+) * 100;
+
+document.getElementById(
     "avisosCerrados"
-    ).innerText =
-    avisosCerrados;
+).innerText =
+porcentajeAvisosCerrados.toFixed(1) + "%";
 
     document.getElementById(
     "mtbf"
