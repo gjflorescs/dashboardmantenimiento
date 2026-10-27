@@ -82,7 +82,7 @@ body{
 
 .grid{
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(500px,1fr))
+    grid-template-columns:repeat(auto-fit,minmax(500px,1fr));
     gap:20px;
     margin-top:20px;
 }
@@ -936,37 +936,43 @@ function construirRuta(base){
 
 function construirActividadesHoy(base){
 
-    console.log("COLUMNAS:");
-console.log(Object.keys(base[0]));
-
-console.log("FECHAS:");
-
-base.forEach(r => {
-
-    console.log(
-        r["Fecha de programación"]
-    );
-
-});
-
     let html = "";
 
     const hoy = new Date();
 
-    const fechaHoy =
-    hoy.toLocaleDateString(
-        "es-SV"
-    );
-
     const actividadesHoy =
-    base.filter(r =>
+    base.filter(r => {
 
-        String(
-            r["Fecha de programación"] || ""
-        ).trim()
-        === fechaHoy
+        const excelDate =
+        r["Fecha de programación"];
 
-    );
+        if(!excelDate)
+            return false;
+
+        const fecha =
+        new Date(
+            (excelDate - 25569) *
+            86400 * 1000
+        );
+
+        return (
+
+            fecha.getDate() ===
+            hoy.getDate()
+
+            &&
+
+            fecha.getMonth() ===
+            hoy.getMonth()
+
+            &&
+
+            fecha.getFullYear() ===
+            hoy.getFullYear()
+
+        );
+
+    });
 
     console.log(
         "Actividades hoy:",
