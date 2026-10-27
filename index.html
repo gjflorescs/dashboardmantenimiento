@@ -929,6 +929,30 @@ function construirActividadesHoy(base){
     const hoy = new Date();
 
     const actividadesHoy =
+
+    console.table(
+    base
+    .filter(x =>
+        String(
+            x["Actividad"] || ""
+        ).includes("Fabric")
+        ||
+        String(
+            x["Actividad"] || ""
+        ).includes("termografía")
+        ||
+        String(
+            x["Actividad"] || ""
+        ).includes("Pistón")
+    )
+    .map(x => ({
+        maquina: x["Máquina"],
+        actividad: x["Actividad"],
+        fecha: x["Fecha de programación"]
+    }))
+);
+
+        
     base.filter(r => {
 
         const excelDate =
