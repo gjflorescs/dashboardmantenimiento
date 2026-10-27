@@ -974,6 +974,16 @@ function construirActividadesHoy(base){
 
     });
 
+    console.table(
+    base
+    .filter(x => x["Fecha de programación"])
+    .slice(0,10)
+    .map(x => ({
+        actividad: x["Actividad"],
+        fecha: x["Fecha de programación"]
+    }))
+);
+
     console.log(
     "Base total:",
     base.length
