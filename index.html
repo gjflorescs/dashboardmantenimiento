@@ -928,89 +928,31 @@ function construirActividadesHoy(base){
 
     const hoy = new Date();
 
+    const hoyExcel =
+        Math.floor(
+            (Date.UTC(
+                hoy.getFullYear(),
+                hoy.getMonth(),
+                hoy.getDate()
+            ) / 86400000)
+            + 25569
+        );
+
     const actividadesHoy =
+    base.filter(r =>
 
-    console.table(
-    base
-    .filter(x =>
-        String(
-            x["Actividad"] || ""
-        ).includes("Fabric")
-        ||
-        String(
-            x["Actividad"] || ""
-        ).includes("termografía")
-        ||
-        String(
-            x["Actividad"] || ""
-        ).includes("Pistón")
-    )
-    .map(x => ({
-        maquina: x["Máquina"],
-        actividad: x["Actividad"],
-        fecha: x["Fecha de programación"]
-    }))
-);
+        Math.floor(
+            r["Fecha de programación"]
+        ) === hoyExcel
 
-        
-    base.filter(r => {
-
-        const excelDate =
-        r["Fecha de programación"];
-
-        if(!excelDate)
-            return false;
-
-        const fecha =
-        new Date(
-            (excelDate - 25569) *
-            86400 * 1000
-        );
-
-        return (
-
-            fecha.getDate() ===
-            hoy.getDate()
-
-            &&
-
-            fecha.getMonth() ===
-            hoy.getMonth()
-
-            &&
-
-            fecha.getFullYear() ===
-            hoy.getFullYear()
-
-        );
-
-    });
-
-    console.table(
-    base
-    .filter(x => x["Fecha de programación"])
-    .slice(0,10)
-    .map(x => ({
-        actividad: x["Actividad"],
-        fecha: x["Fecha de programación"]
-    }))
-);
-
-    console.log(
-    "Base total:",
-    base.length
-);
-
-console.log(
-    "Actividades hoy:",
-    actividadesHoy
-);
-    console.table(actividadesHoy);
+    );
 
     console.log(
         "Actividades hoy:",
         actividadesHoy.length
     );
+
+    console.table(actividadesHoy);
 
     actividadesHoy.forEach(r => {
 
