@@ -2,7 +2,18 @@
 <html lang="es">
 
 <head>
+console.log("COLUMNAS:");
+console.log(Object.keys(base[0]));
 
+console.log("FECHAS:");
+
+base.forEach(r => {
+
+    console.log(
+        r["Fecha de programación"]
+    );
+
+});
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -924,6 +935,19 @@ function construirRuta(base){
 }
 
 function construirActividadesHoy(base){
+
+    console.log("COLUMNAS:");
+console.log(Object.keys(base[0]));
+
+console.log("FECHAS:");
+
+base.forEach(r => {
+
+    console.log(
+        r["Fecha de programación"]
+    );
+
+});
 
     let html = "";
 
