@@ -923,44 +923,31 @@ function construirRuta(base){
 
 }
 
-    function construirActividadesHoy(base){
+function construirActividadesHoy(base){
 
     let html = "";
 
     const hoy = new Date();
 
+    const fechaHoy =
+    hoy.toLocaleDateString(
+        "es-SV"
+    );
+
     const actividadesHoy =
-    base.filter(r => {
+    base.filter(r =>
 
-        const excelDate =
-r["Fecha de programación"];
+        String(
+            r["Fecha de programación"] || ""
+        ).trim()
+        === fechaHoy
 
-const fecha =
-typeof excelDate === "number"
-? new Date(
-    (excelDate - 25569) *
-    86400 * 1000
-)
-: new Date(excelDate);
+    );
 
-        return (
-
-            fecha.getDate() ===
-            hoy.getDate()
-
-            &&
-
-            fecha.getMonth() ===
-            hoy.getMonth()
-
-            &&
-
-            fecha.getFullYear() ===
-            hoy.getFullYear()
-
-        );
-
-    });
+    console.log(
+        "Actividades hoy:",
+        actividadesHoy.length
+    );
 
     actividadesHoy.forEach(r => {
 
