@@ -273,6 +273,30 @@ Sin actualizar
 
 </div>
 
+<br>
+
+<div class="card">
+
+    <h2>Actividades Programadas Hoy</h2>
+
+    <table>
+
+        <thead>
+            <tr>
+                <th>Máquina</th>
+                <th>Actividad</th>
+                <th>Tipo</th>
+                <th>Estatus</th>
+            </tr>
+        </thead>
+
+        <tbody id="tablaHoy">
+        </tbody>
+
+    </table>
+
+</div>
+
 </div>
 
 <script>
@@ -624,6 +648,7 @@ porcentajeAvisosCerrados.toFixed(1) + "%";
     graficarReportantes();
     graficarTecnicos();
     construirRuta(base);
+    construirActividadesHoy(base);
 
 }
 
@@ -898,6 +923,63 @@ function construirRuta(base){
 
 }
 
+    function construirActividadesHoy(base){
+
+    let html = "";
+
+    const hoy = new Date();
+
+    const actividadesHoy =
+    base.filter(r => {
+
+        const excelDate =
+r["Fecha de programación"];
+
+const fecha =
+typeof excelDate === "number"
+? new Date(
+    (excelDate - 25569) *
+    86400 * 1000
+)
+: new Date(excelDate);
+
+        return (
+
+            fecha.getDate() ===
+            hoy.getDate()
+
+            &&
+
+            fecha.getMonth() ===
+            hoy.getMonth()
+
+            &&
+
+            fecha.getFullYear() ===
+            hoy.getFullYear()
+
+        );
+
+    });
+
+    actividadesHoy.forEach(r => {
+
+        html += `
+        <tr>
+            <td>${r["Máquina"] || ""}</td>
+            <td>${r["Actividad"] || ""}</td>
+            <td>${r["Tipo"] || ""}</td>
+            <td>${r["Estatus"] || ""}</td>
+        </tr>
+        `;
+
+    });
+
+    document.getElementById(
+        "tablaHoy"
+    ).innerHTML = html;
+
+}
 
     document
 .getElementById("archivoExcel")
