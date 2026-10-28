@@ -296,6 +296,31 @@ Sin actualizar
 
 </div>
 
+<br>
+
+<div class="card">
+
+    <h2>Actividades Pendientes</h2>
+
+    <table>
+
+        <thead>
+            <tr>
+                <th>Máquina</th>
+                <th>Actividad</th>
+                <th>Tipo</th>
+                <th>Fecha</th>
+                <th>Días Pendiente</th>
+            </tr>
+        </thead>
+
+        <tbody id="tablaPendientes">
+        </tbody>
+
+    </table>
+
+</div>
+
 </div>
 
 <script>
@@ -648,6 +673,7 @@ porcentajeAvisosCerrados.toFixed(1) + "%";
     graficarTecnicos();
     construirRuta(base);
     construirActividadesHoy(base);
+    construirPendientes(base);
 
 }
 
@@ -969,6 +995,71 @@ function construirActividadesHoy(base){
 
     document.getElementById(
         "tablaHoy"
+    ).innerHTML = html;
+
+}
+
+function construirPendientes(base){
+
+    let html = "";
+
+    const hoy = new Date();
+
+    const pendientes =
+    base.filter(r =>
+
+        String(
+            r["Estatus"] || ""
+        )
+        .trim()
+        .toLowerCase()
+        .includes("abierto")
+
+    );
+
+    pendientes
+    .sort((a,b)=>
+        a["Fecha de programación"] -
+        b["Fecha de programación"]
+    )
+    .forEach(r => {
+
+        const excelDate =
+        r["Fecha de programación"];
+
+        const fecha =
+        new Date(
+            (excelDate - 25569) *
+            86400 * 1000
+        );
+
+        const diasPendiente =
+        Math.floor(
+            (
+                hoy - fecha
+            ) /
+            (1000 * 60 * 60 * 24)
+        );
+
+        const fechaTexto =
+        fecha.toLocaleDateString(
+            "es-SV"
+        );
+
+        html += `
+        <tr>
+            <td>${r["Máquina"] || ""}</td>
+            <td>${r["Actividad"] || ""}</td>
+            <td>${r["Tipo"] || ""}</td>
+            <td>${fechaTexto}</td>
+            <td>${diasPendiente}</td>
+        </tr>
+        `;
+
+    });
+
+    document.getElementById(
+        "tablaPendientes"
     ).innerHTML = html;
 
 }
