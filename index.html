@@ -188,16 +188,6 @@ Sin actualizar
 </div>
 
 <div class="card">
-<div id="maquinas" class="valor">0</div>
-<div>Máquinas</div>
-</div>
-
-<div class="card">
-<div id="especialidades" class="valor">0</div>
-<div>Especialidades</div>
-</div>
-
-<div class="card">
 <div id="rutaCriticaKpi" class="valor">0</div>
 <div>Ruta Crítica</div>
 </div>
@@ -206,7 +196,17 @@ Sin actualizar
 <div id="avisosTotal" class="valor">0</div>
 <div>Total Avisos</div>
 </div>
-
+    
+<div class="card">
+<div id="avisosCerradosCantidad" class="valor">0</div>
+<div>Avisos Cerrados</div>
+</div>
+    
+<div class="card">
+<div id="avisosAbiertos" class="valor">0</div>
+<div>Avisos Nuevos / Abiertos</div>
+</div>
+    
 <div class="card">
 <div id="avisosCerrados" class="valor">0</div>
 <div>Cierre de Avisos</div>
@@ -569,20 +569,49 @@ rutaCriticaAbierta.length;
         total
     )*100;
 
-    const maquinas =
-    new Set(
-        base
-        .map(x => x["Máquina"])
-        .filter(Boolean)
-    ).size;
+    const avisosCerradosCantidad =
+datosAvisos.filter(x => {
 
-    const especialidades =
-    new Set(
-        base
-        .map(x => x["Personal"])
-        .filter(Boolean)
-    ).size;
+    const estado =
+    String(
+        x["Estado"] || ""
+    ).toLowerCase();
 
+    return (
+        estado.includes("cerrado")
+        ||
+        estado.includes("resuelto")
+    );
+
+}).length;
+
+document.getElementById(
+    "avisosCerradosCantidad"
+).innerText =
+avisosCerradosCantidad;
+    
+    const avisosAbiertos =
+datosAvisos.filter(x => {
+
+    const estado =
+    String(
+        x["Estado"] || ""
+    ).toLowerCase();
+
+    return (
+        estado.includes("nuevo")
+        ||
+        estado.includes("asignado")
+        ||
+        estado.includes("en_proceso")
+    );
+
+}).length;
+
+document.getElementById(
+    "avisosAbiertos"
+).innerText =
+avisosAbiertos;
     document.getElementById(
     "mttr"
     ).innerText =
